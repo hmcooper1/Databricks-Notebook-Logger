@@ -1,0 +1,66 @@
+====================================================================================================
+user                 : hmcooper@berkeley.edu
+run start timestamp  : 2026-03-07T16:02:54+00:00
+notebook             : /Repos/hmcooper@berkeley.edu/Databricks-Notebook-Logger/demo/error_notebook
+log file             : /Repos/hmcooper@berkeley.edu/Databricks-Notebook-Logger/demo/error_notebook.log
+cluster id           : 0307-160243-9junmck2-v2n
+python               : 3.12.3
+ipython              : 8.32.0
+spark                : 3.5.2
+====================================================================================================
+NOTE: Logging started
+
+----------------------------------------------------------------------------------------------------
+# Imports
+import pyspark
+from pyspark import sql, SparkConf
+from pyspark.sql import functions as f
+from pyspark.sql.types import *
+import os, sys
+from pyspark.sql.window import Window
+import warnings
+from datetime import date
+
+NOTE: Cell started at  2026-03-07T16:03:09+00:00 and finished at 2026-03-07T16:03:09+00:00
+NOTE: Step completed in 0.02 seconds
+----------------------------------------------------------------------------------------------------
+# Create sample patient visit data
+visit_data = [
+    ("P001", date(2023, 8, 21), "99213", "Hypertension"),
+    ("P002", date(2023, 8, 22), "99214", "Diabetes"),
+    ("P003", date(2023, 8, 23), "99212", "Annual checkup"),
+    ("P001", date(2023, 8, 24), "99215", "Hypertension"),
+    ("P004", date(2023, 8, 25), "99213", "Asthma"),
+    ("P002", date(2023, 8, 26), "99213", "Diabetes"),
+]
+
+patient_visits = spark.createDataFrame(visit_data, ["patient_id", "visit_date", "procedure_code", "diagnosis"])
+patient_visits.show()
+
++----------+----------+--------------+--------------+
+|patient_id|visit_date|procedure_code|     diagnosis|
++----------+----------+--------------+--------------+
+|      P001|2023-08-21|         99213|  Hypertension|
+|      P002|2023-08-22|         99214|      Diabetes|
+|      P003|2023-08-23|         99212|Annual checkup|
+|      P001|2023-08-24|         99215|  Hypertension|
+|      P004|2023-08-25|         99213|        Asthma|
+|      P002|2023-08-26|         99213|      Diabetes|
++----------+----------+--------------+--------------+
+
+NOTE: Cell started at  2026-03-07T16:03:10+00:00 and finished at 2026-03-07T16:03:10+00:00
+NOTE: Step completed in 0.51 seconds
+----------------------------------------------------------------------------------------------------
+raise ValueError("This is a test error.")
+
+NOTE: Cell started at  2026-03-07T16:03:10+00:00 and finished at 2026-03-07T16:03:11+00:00
+NOTE: Step completed in 0.60 seconds
+ERROR: ValueError: This is a test error.
+NOTE: Logging stopped due to cell error.
+
+====================================================================================================
+NOTEBOOK DID NOT SUCCESSFULLY RUN DUE TO ERROR
+ERROR: ValueError: This is a test error.
+run end timestamp    : 2026-03-07T16:03:11+00:00
+total runtime        : 17.08 seconds
+====================================================================================================

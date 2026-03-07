@@ -1,0 +1,202 @@
+====================================================================================================
+user                 : hmcooper@berkeley.edu
+run start timestamp  : 2026-03-07T16:04:09+00:00
+notebook             : /Repos/hmcooper@berkeley.edu/Databricks-Notebook-Logger/demo/demo_notebook
+log file             : /Repos/hmcooper@berkeley.edu/Databricks-Notebook-Logger/demo/demo_notebook.log
+cluster id           : 0307-152139-2nq82ksz-v2n
+python               : 3.12.3
+ipython              : 8.32.0
+spark                : 3.5.2
+====================================================================================================
+NOTE: Logging started
+
+----------------------------------------------------------------------------------------------------
+# Imports
+import pyspark
+from pyspark import sql, SparkConf
+from pyspark.sql import functions as f
+from pyspark.sql.types import *
+import os, sys
+from pyspark.sql.window import Window
+import warnings
+from datetime import date
+
+NOTE: Cell started at  2026-03-07T16:04:25+00:00 and finished at 2026-03-07T16:04:25+00:00
+NOTE: Step completed in 0.02 seconds
+----------------------------------------------------------------------------------------------------
+# Create sample patient visit data
+visit_data = [
+    ("P001", date(2023, 8, 21), "99213", "Hypertension"),
+    ("P002", date(2023, 8, 22), "99214", "Diabetes"),
+    ("P003", date(2023, 8, 23), "99212", "Annual checkup"),
+    ("P001", date(2023, 8, 24), "99215", "Hypertension"),
+    ("P004", date(2023, 8, 25), "99213", "Asthma"),
+    ("P002", date(2023, 8, 26), "99213", "Diabetes"),
+]
+
+patient_visits = spark.createDataFrame(visit_data, ["patient_id", "visit_date", "procedure_code", "diagnosis"])
+patient_visits.show()
+
++----------+----------+--------------+--------------+
+|patient_id|visit_date|procedure_code|     diagnosis|
++----------+----------+--------------+--------------+
+|      P001|2023-08-21|         99213|  Hypertension|
+|      P002|2023-08-22|         99214|      Diabetes|
+|      P003|2023-08-23|         99212|Annual checkup|
+|      P001|2023-08-24|         99215|  Hypertension|
+|      P004|2023-08-25|         99213|        Asthma|
+|      P002|2023-08-26|         99213|      Diabetes|
++----------+----------+--------------+--------------+
+
+NOTE: Cell started at  2026-03-07T16:04:25+00:00 and finished at 2026-03-07T16:04:25+00:00
+NOTE: Step completed in 0.43 seconds
+----------------------------------------------------------------------------------------------------
+# Create sample patient demographics table
+demographics_data = [
+    ("P001", "Male", 45, "Commercial"),
+    ("P002", "Female", 62, "Medicare"),
+    ("P003", "Male", 34, "Commercial"),
+    ("P004", "Female", 28, "Medicaid")
+]
+
+demographics = spark.createDataFrame(demographics_data, ["patient_id", "gender", "age", "insurance"])
+demographics.show()
+
++----------+------+---+----------+
+|patient_id|gender|age| insurance|
++----------+------+---+----------+
+|      P001|  Male| 45|Commercial|
+|      P002|Female| 62|  Medicare|
+|      P003|  Male| 34|Commercial|
+|      P004|Female| 28|  Medicaid|
++----------+------+---+----------+
+
+NOTE: Cell started at  2026-03-07T16:04:25+00:00 and finished at 2026-03-07T16:04:25+00:00
+NOTE: Step completed in 0.28 seconds
+----------------------------------------------------------------------------------------------------
+# Join sample visit with demographic data
+patient_analysis = patient_visits.join(demographics, on="patient_id", how="left")
+patient_analysis.show()
+
++----------+----------+--------------+--------------+------+---+----------+
+|patient_id|visit_date|procedure_code|     diagnosis|gender|age| insurance|
++----------+----------+--------------+--------------+------+---+----------+
+|      P001|2023-08-21|         99213|  Hypertension|  Male| 45|Commercial|
+|      P002|2023-08-22|         99214|      Diabetes|Female| 62|  Medicare|
+|      P003|2023-08-23|         99212|Annual checkup|  Male| 34|Commercial|
+|      P001|2023-08-24|         99215|  Hypertension|  Male| 45|Commercial|
+|      P004|2023-08-25|         99213|        Asthma|Female| 28|  Medicaid|
+|      P002|2023-08-26|         99213|      Diabetes|Female| 62|  Medicare|
++----------+----------+--------------+--------------+------+---+----------+
+
+NOTE: Cell started at  2026-03-07T16:04:26+00:00 and finished at 2026-03-07T16:04:26+00:00
+NOTE: Step completed in 0.59 seconds
+----------------------------------------------------------------------------------------------------
+# Create sample summary statistics by demographics
+summary = patient_analysis.groupBy("gender", "insurance") \
+    .agg(
+        f.count("visit_date").alias("total_visits"),
+        f.countDistinct("patient_id").alias("unique_patients"),
+        f.avg("age").alias("avg_age")
+    ) \
+    .orderBy("gender", "insurance")
+
+summary.show(truncate=False)
+
++------+----------+------------+---------------+------------------+
+|gender|insurance |total_visits|unique_patients|avg_age           |
++------+----------+------------+---------------+------------------+
+|Female|Medicaid  |1           |1              |28.0              |
+|Female|Medicare  |2           |1              |62.0              |
+|Male  |Commercial|3           |2              |41.333333333333336|
++------+----------+------------+---------------+------------------+
+
+NOTE: Cell started at  2026-03-07T16:04:26+00:00 and finished at 2026-03-07T16:04:27+00:00
+NOTE: Step completed in 0.73 seconds
+----------------------------------------------------------------------------------------------------
+# Test print statement
+print("Analysis complete: Generated summary statistics by gender and insurance type.")
+
+Analysis complete: Generated summary statistics by gender and insurance type.
+
+NOTE: Cell started at  2026-03-07T16:04:27+00:00 and finished at 2026-03-07T16:04:27+00:00
+NOTE: Step completed in 0.00 seconds
+----------------------------------------------------------------------------------------------------
+# Create temporary view to query with SQL
+patient_visits.createOrReplaceTempView("patient_visits")
+
+NOTE: Cell started at  2026-03-07T16:04:27+00:00 and finished at 2026-03-07T16:04:27+00:00
+NOTE: Step completed in 0.25 seconds
+----------------------------------------------------------------------------------------------------
+# Query from spark.sql() will show up in the log
+spark.sql("""
+create or replace temp view diagnosis_summary as
+select diagnosis, count(*) as patient_count
+from patient_visits
+group by diagnosis
+""")
+
+NOTE: Cell started at  2026-03-07T16:04:28+00:00 and finished at 2026-03-07T16:04:28+00:00
+NOTE: Step completed in 0.29 seconds
+----------------------------------------------------------------------------------------------------
+# Spark is lazy: doesn't actually execute this query - output will NOT display in the log
+spark.sql("""
+select count(*) as total_diagnoses
+from diagnosis_summary
+""")
+
+NOTE: Cell started at  2026-03-07T16:04:28+00:00 and finished at 2026-03-07T16:04:28+00:00
+NOTE: Step completed in 0.19 seconds
+----------------------------------------------------------------------------------------------------
+# Use .show(truncate=False) to execute query and display output in the log file
+# truncate=False ensures no values are truncated/cut off in the log file
+spark.sql("""
+select *
+from diagnosis_summary
+where diagnosis = 'Hypertension'
+    or diagnosis = 'Diabetes'
+""").show(truncate=False)
+
++------------+-------------+
+|diagnosis   |patient_count|
++------------+-------------+
+|Hypertension|2            |
+|Diabetes    |2            |
++------------+-------------+
+
+NOTE: Cell started at  2026-03-07T16:04:28+00:00 and finished at 2026-03-07T16:04:29+00:00
+NOTE: Step completed in 0.39 seconds
+----------------------------------------------------------------------------------------------------
+# Use log_df to display table contents in the log file
+log_df("diagnosis_summary", limit=10)
+
+[LOG] Showing table: diagnosis_summary
++--------------+-------------+
+|diagnosis     |patient_count|
++--------------+-------------+
+|Hypertension  |2            |
+|Diabetes      |2            |
+|Annual checkup|1            |
+|Asthma        |1            |
++--------------+-------------+
+
+NOTE: Cell started at  2026-03-07T16:04:29+00:00 and finished at 2026-03-07T16:04:29+00:00
+NOTE: Step completed in 0.48 seconds
+----------------------------------------------------------------------------------------------------
+# User warning
+warnings.warn("This is a test warning", UserWarning)
+
+WARNING: This is a test warning
+
+NOTE: Cell started at  2026-03-07T16:04:29+00:00 and finished at 2026-03-07T16:04:29+00:00
+NOTE: Step completed in 0.00 seconds
+----------------------------------------------------------------------------------------------------
+stop_logging()
+
+
+====================================================================================================
+NOTEBOOK RAN SUCCESSFULLY WITH NO ERRORS
+WARNING: This is a test warning
+run end timestamp    : 2026-03-07T16:04:29+00:00
+total runtime        : 20.87 seconds
+====================================================================================================

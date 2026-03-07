@@ -468,10 +468,10 @@ def _emergency_flush(reason: str):
         # hard reset so future starts are clean (also restores warnings handler)
         _force_reset_logging_state()
 
-### USE SFTP TO UPLOAD LOG AND HTML TO PROJ FOLDER ================================================== ###
+### USE SFTP TO UPLOAD LOG AND HTML TO REMOTE DIRECTORY ============================================= ###
 def _sftp_upload_artifacts(content: str):
     """
-    Save local .log, export .html, and upload both to project folder using SFTP
+    Save local .log, export .html, and upload both to remote directory using SFTP
     """
     # write log file locally
     try:
@@ -491,7 +491,7 @@ def _sftp_upload_artifacts(content: str):
         elif not _sftp_remote_dir:
             print("SFTP: remote directory not set; skipping upload")
         else:
-            # upload log to project folder
+            # upload log to remote directory
             remote_log = f"{_sftp_remote_dir.rstrip('/')}/{Path(_sftp_local_path).name}"
             sftp.upload_file(
                 local_path=_sftp_local_path,
@@ -543,7 +543,7 @@ def _sftp_upload_artifacts(content: str):
         print(f"SFTP upload failed: {e}")
 
 ### START LOGGING =================================================================================== ###
-def start_logging(project_folder : str | None = None):
+def start_logging(output_directory : str | None = None):
     """
     Start the notebook logging system > set up a log buffer, register pre/post cell hooks to capture cell input/output, patch Python warning system so warnings can be logged, writes header to the log. Logging will continue until the first cell error, when stop_logging is automatically called (or when stop_logging is called in the notebook).
     """
@@ -624,11 +624,11 @@ def start_logging(project_folder : str | None = None):
 
     # SFTP setup
     global _sftp_creds, _sftp_local_path, _sftp_remote_dir
-    _sftp_remote_dir = project_folder  # e.g., "/userdata/cfor/projects/p26_ifx_015/logs"
+    _sftp_remote_dir = output_directory
 
-    if not project_folder:
-        print("No project folder specified. SFTP upload will be skipped.")
-        print("Please specify a project folder to enable SFTP upload, e.g. start_logging(project_folder='path/to/project/folder')")
+    if not output_directory:
+        print("No remote directory specified. SFTP upload will be skipped.")
+        print("Please specify a remote directory to enable SFTP upload, e.g. start_logging(output_directory='path/to/output/directory')")
         _sftp_creds = None
         _sftp_local_path = None
     elif sftp is None:

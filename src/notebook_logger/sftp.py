@@ -2,11 +2,10 @@
 # Requirements implemented:
 # - Databricks-friendly: host/port widgets only; username/password never shown in widgets
 # - Installs paramiko if missing
-# - ALWAYS prompts/sets up credentials when this notebook is %run
+# - ALWAYS prompts/sets up credentials
 # - If you choose NOT to persist credentials, uploads in the SAME notebook session will NOT re-prompt
 #   (credentials are cached in-memory for this run)
 # - Optionally persists credentials to a secure file (best effort chmod 600)
-# - On %run: prints function availability and runs an automatic upload test
 
 ### SETUP =========================================================================================== ###
 # 0) paramiko install if missing
@@ -144,7 +143,7 @@ def validate_credentials(host: str, port: int, username: str, password: str) -> 
             pass
 
     except paramiko.AuthenticationException:
-        raise RuntimeError("Authentication failed: Invalid user ID or password.")
+        raise RuntimeError("Authentication failed: Invalid username or password.")
     except socket.gaierror:
         raise RuntimeError("Connection failed: Invalid SFTP host name.")
     except ConnectionRefusedError:
@@ -205,8 +204,6 @@ def _write_saved_creds(host: str, port: int, username: str, password: str) -> bo
 
 # 6) credential flow
 def get_sftp_credentials(
-    default_host: str = "sftp.example.com",
-    default_port: int = 22,
     prefer_cached: bool = True
 ) -> Tuple[str, int, str, str]:
     """
@@ -232,8 +229,8 @@ def get_sftp_credentials(
     env_user = os.getenv("SFTP_USER")
     env_pass = os.getenv("SFTP_PASSWORD")
     env_port = os.getenv("SFTP_PORT")
-    if env_host and env_user and env_pass:
-        port = int(env_port) if env_port else default_port
+    if env_host and env_user and env_pass and env_port:
+        port = int(env_port)
         creds = (env_host, port, env_user, env_pass)
         _CACHED_CREDS = creds
         _vprint("Using credentials from environment variables.")
@@ -245,14 +242,14 @@ def get_sftp_credentials(
         try:
             dbutils.widgets.get("SFTP_HOST")  # type: ignore[name-defined]
         except Exception:
-            dbutils.widgets.text("SFTP_HOST", default_host)  # type: ignore[name-defined]
+            dbutils.widgets.text("SFTP_HOST", "")  # type: ignore[name-defined]
         try:
             dbutils.widgets.get("SFTP_PORT")  # type: ignore[name-defined]
         except Exception:
-            dbutils.widgets.text("SFTP_PORT", str(default_port))  # type: ignore[name-defined]
+            dbutils.widgets.text("SFTP_PORT", "")  # type: ignore[name-defined]
 
-        host_widget = _get_widget("SFTP_HOST") or default_host
-        port_widget = _get_widget("SFTP_PORT") or str(default_port)
+        host_widget = _get_widget("SFTP_HOST")
+        port_widget = _get_widget("SFTP_PORT")
 
         saved = _read_saved_creds()
         saved_flag = (_get_widget("SFTP_ONE_TIME") or "").lower() in ("1", "true", "yes")
@@ -284,12 +281,19 @@ def get_sftp_credentials(
 
         # 4) interactive collection
         print("Enter SFTP credentials for this run.")
-        host = input(f"SFTP host [press ENTER for default - {host_widget}]: ").strip() or host_widget
-        port_in = input(f"SFTP port [press ENTER for default - {port_widget}]: ").strip() or port_widget
-        try:
-            port = int(port_in)
-        except Exception:
-            port = default_port
+        host = input("SFTP host: ").strip()
+        while not host:
+            print("Host is required.")
+            host = input("SFTP host: ").strip()
+        
+        port_in = input("SFTP port: ").strip()
+        while True:
+            try:
+                port = int(port_in)
+                break
+            except Exception:
+                print("Invalid port. Please enter a valid port number.")
+                port_in = input("SFTP port: ").strip()
         username = input("SFTP username: ").strip()
         password = getpass.getpass("SFTP password (hidden): ")
 
@@ -347,14 +351,20 @@ def get_sftp_credentials(
             _CACHED_CREDS = creds
             return creds
 
-    host = input(f"SFTP host [press ENTER for default - {default_host}]: ").strip() or default_host
-    port_in = input(f"SFTP port [press ENTER for default - {default_port}]: ").strip() or str(default_port)
-    try:
-        port = int(port_in)
-    except Exception:
-        print(f"Invalid SFTP port entered. Defaulting to {default_port}.")
-        port = default_port
-    username = input("User ID: ").strip()
+    host = input("SFTP host: ").strip()
+    while not host:
+        print("Host is required.")
+        host = input("SFTP host: ").strip()
+    
+    port_in = input("SFTP port: ").strip()
+    while True:
+        try:
+            port = int(port_in)
+            break
+        except Exception:
+            print("Invalid port. Please enter a valid port number.")
+            port_in = input("SFTP port: ").strip()
+    username = input("Username: ").strip()
     password = getpass.getpass("Password (hidden): ")
 
     if not all([host, username, password]):
