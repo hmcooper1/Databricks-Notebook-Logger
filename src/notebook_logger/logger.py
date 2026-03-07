@@ -1,7 +1,4 @@
-### ALL FUNCTIONS TO IMPORT ========================================================================= ###
-__all__ = ["start_logging", "stop_logging", "log_df"]
-
-### IMPORTS ========================================================================================= ###
+### IMPORTS =============================================================================== ###
 import time, datetime                     # for date and time
 import base64, json                       # encode content for Workspace API
 import re, io                             # re: regex to ensure safe filename, io: in memory StringIO buffer for log
@@ -20,7 +17,7 @@ try:
 except Exception:
     sftp = None
 
-### GLOBALS REPRESENTING CURRENT RUN ================================================================ ###
+### GLOBALS REPRESENTING CURRENT RUN ====================================================== ###
 # logger / run state
 _is_logging = False                       # keep track if a run is active
 _buf = None                               # io.StringIO: in memory text stream that stores all log data
@@ -53,7 +50,7 @@ _sftp_creds = None
 _sftp_local_path = None
 _sftp_remote_dir = None     # str remote dir passed by start_logging(...)
 
-### HELPER FUNCTIONS ================================================================================ ###
+### HELPER FUNCTIONS ====================================================================== ###
 def _safe_filename(name: str) -> str:
     """ Replace invalid characters in a Workspace path (spaces, weird characters) with underscores, and get rid of leading or trailing underscores. If name is empty after this, just label "notebook" """
     return re.sub(r"[^A-Za-z0-9._-]+", "_", name).strip("_") or "notebook"
@@ -87,7 +84,7 @@ def _get_basic_metadata():
         "cluster_id": c.clusterId().get(),
     }
 
-### USE DB API TO UPLOAD LOG TO WORKSPACE =========================================================== ###
+### USE DB API TO UPLOAD LOG TO WORKSPACE ================================================= ###
 def _workspace_import_text(path: str, content: str, overwrite: bool = True):
     """
     Upload plain text directly to Workspace using the DB REST API and the token from the current notebook session. Don't create any temporary files and don't need any extra input from user.
@@ -122,7 +119,7 @@ def _workspace_import_text(path: str, content: str, overwrite: bool = True):
     if resp.status_code != 200:
         raise RuntimeError(f"Workspace import failed: {resp.status_code} {resp.text}")
 
-### EXPORT WORKSPACE FILES ========================================================================== ###
+### EXPORT WORKSPACE FILES ================================================================ ###
 def _workspace_export_text(path: str, format: str):
     """
     Export a Workspace file (SOURCE, HTML, JUPYTER) and return decoded text
@@ -168,7 +165,7 @@ def _download_link(filename: str, text: str, label: str):
     # tell ipython to render html in notebook output
     display(HTML(html))
 
-### RESET LOGGING FUNCTIONS AND STATE =============================================================== ###
+### RESET LOGGING FUNCTIONS AND STATE ==================================================== ###
 def _force_reset_logging_state():
     """
     Clean up everything logger has modified (hooks, warnings, globals, buffers) so a future call to start_logging begins from a clean state. Run at the beginning of start_logging, at the end of stop_logging, and during an emergency if an error occurs in the middle of the notebook
@@ -215,7 +212,7 @@ def _force_reset_logging_state():
     _sftp_local_path = None
     _sftp_remote_dir = None
 
-### HELPER CLASS TO WRITE OUTPUT TO NOTEBOOK AND LOG FILE =========================================== ###
+### HELPER CLASS TO WRITE OUTPUT TO NOTEBOOK AND LOG FILE ================================ ###
 class _Tee:
     # allows stdout/stderr to be redirected to both streams (assign sys.stdour and sys.stderr to Tee objects)
     # real_stream: where output normally goes, buffer_stream: output is also recorded in log file
@@ -252,7 +249,7 @@ class _Tee:
         except Exception: 
             return False
 
-### ERRORS AND WARNINGS ============================================================================= ###
+### ERRORS AND WARNINGS =================================================================== ###
 def _showwarning_proxy(message, category, filename, lineno, file=None, line=None):
     """
     Capture all warnings from warnings.warn() while logging is active, send them to the notebook UI, and store them in _all_warnings to eventually be printed to the end of the notebook.
@@ -294,7 +291,7 @@ def _extract_error_from_result(result):
         return (None, None)
     return (type(err).__name__, (str(err) or repr(err)))
 
-### PRE-CELL HOOK =================================================================================== ###
+### PRE-CELL HOOK ========================================================================= ###
 # ipython pre_run_cell event passes an object with metadata about the cell being executed into _log_cell_pre, providing details such as raw cell text
 # different versions of ipython submit the event differently > use *args and **kwargs to account for this
 def _log_cell_pre(*args, **kwargs):
@@ -346,7 +343,7 @@ def _log_cell_pre(*args, **kwargs):
     except Exception as e:
         _emergency_flush(f"ERROR logging cell input: {e}")
 
-### POST-CELL HOOK ================================================================================== ###
+### POST-CELL HOOK ======================================================================== ###
 def _log_cell_post(result=None):
     """
     Runs right after each notebook cell executes and restores stdout/stderr, captures all output/warnings/errors from cell, and stops logging upon error.
@@ -443,7 +440,7 @@ def _log_cell_post(result=None):
         _cell_start_time = None
         _cell_warnings = []
 
-### EMERGENCY FLUSH IF LOGGER HAS PROBLEMS ========================================================== ###
+### EMERGENCY FLUSH IF LOGGER HAS PROBLEMS ================================================ ###
 def _emergency_flush(reason: str):
     """
     Append an error footer and try to upload whatever we have to the log buffer so far. Calls _force_reset_logging_state at the end to reset the logging state. Called when the logger itself encounters an internal problem, not when there is an error in the code.
@@ -542,7 +539,7 @@ def _sftp_upload_artifacts(content: str):
     except Exception as e:
         print(f"SFTP upload failed: {e}")
 
-### START LOGGING =================================================================================== ###
+### START LOGGING ========================================================================= ###
 def start_logging(output_directory : str | None = None):
     """
     Start the notebook logging system > set up a log buffer, register pre/post cell hooks to capture cell input/output, patch Python warning system so warnings can be logged, writes header to the log. Logging will continue until the first cell error, when stop_logging is automatically called (or when stop_logging is called in the notebook).
@@ -661,7 +658,7 @@ def start_logging(output_directory : str | None = None):
             _force_reset_logging_state()
             raise
 
-### STOP LOGGING ===================================================================================== ###
+### STOP LOGGING =========================================================================== ###
 def stop_logging(overwrite: bool = True):
     """
     Stops the notebook logging system > appends trailer to the log buffer, prints all warnings, uploads log buffer to the workspace, reset hooks and state, displays log and html file as a clickable downloadable link.
@@ -752,7 +749,7 @@ def stop_logging(overwrite: bool = True):
         # final reset restores the original warnings handler and clears state
         _force_reset_logging_state()
 
-### SQL =========================================================================================== ###
+### SQL ================================================================================= ###
 def log_df(table_name: str, limit: int = 20):
     """ Allow user to display a spark dataframe in the log file and display in the notebook. """
     spark = SparkSession.getActiveSession()

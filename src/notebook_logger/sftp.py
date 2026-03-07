@@ -1,5 +1,4 @@
-### ALL FUNCTIONS TO IMPORT ========================================================================= ###
-# Requirements implemented:
+### REQUIREMENTS IMPLEMENTED ============================================================== ###
 # - Databricks-friendly: host/port widgets only; username/password never shown in widgets
 # - Installs paramiko if missing
 # - ALWAYS prompts/sets up credentials
@@ -7,7 +6,7 @@
 #   (credentials are cached in-memory for this run)
 # - Optionally persists credentials to a secure file (best effort chmod 600)
 
-### SETUP =========================================================================================== ###
+### SETUP ================================================================================ ###
 # 0) paramiko install if missing
 try:
     import paramiko  # noqa: F401
@@ -23,7 +22,6 @@ except ModuleNotFoundError:
 # 1) standard imports
 import getpass
 import json
-import logging
 import os
 import sys
 import socket
@@ -65,7 +63,7 @@ def _get_dbutils_username() -> Optional[str]:
     except Exception:
         return None
 
-### FILE PATHS ====================================================================================== ###
+### FILE PATHS ============================================================================ ###
 # 3) choose a writable credential file path (best-effort)
 def _candidate_cred_paths() -> List[Path]:
     
@@ -106,7 +104,7 @@ if CRED_FILE is None:
 else:
     print(f"Credential persistence path chosen: {CRED_FILE}")
 
-### WIDGETS ========================================================================================= ###
+### WIDGETS =============================================================================== ###
 # 4) databricks widget helpers (host & port only)
 def _in_databricks() -> bool:
     try:
@@ -131,7 +129,7 @@ def _set_widget(name: str, value: str):
     except Exception:
         pass
 
-### SAVE/LOAD CREDENTIALS =========================================================================== ###
+### SAVE/LOAD CREDENTIALS ================================================================ ###
 # 5) secure save/load of credentials (best-effort, chmod 600)
 def validate_credentials(host: str, port: int, username: str, password: str) -> None:
     """
@@ -394,7 +392,7 @@ def get_sftp_credentials(
 
     return creds
 
-### SFTP ============================================================================================ ###
+### SFTP ================================================================================== ###
 # 7) SFTP client manager & helpers
 class SFTPClientManager:
     def __init__(self, hostname: str, port: int, username: str, password: str):
@@ -450,7 +448,7 @@ class SFTPClientManager:
         self.sftp.put(local_path, remote_path)
         _vprint("Upload completed successfully.")
 
-### UPLOAD FILES ==================================================================================== ###
+### UPLOAD FILES ========================================================================== ###
 def upload_file(local_path: str, remote_path: str, creds: Optional[Tuple[str, int, str, str]] = None):
     """Upload a single file. If creds is None, uses cached creds if available; otherwise runs credential flow."""
     if not Path(local_path).exists():
@@ -466,15 +464,15 @@ def upload_file(local_path: str, remote_path: str, creds: Optional[Tuple[str, in
     with SFTPClientManager(host, port, user, pwd) as sftp_mgr:
         sftp_mgr.upload(local_path=local_path, remote_path=remote_path)   
 
-def upload_log_to_project(
+def upload_log_to_directory(
     local_log_path: Optional[str] = None,
-    project_remote_dir: str = "/project/logs"
+    remote_dir: str = "/output/logs"
 ) -> str:
-    """Upload a log file to the project's remote log directory. Returns the remote path."""
+    """Upload a log file to the designated remote log directory. Returns the remote path."""
     local_path = str(local_log_path)
     if not local_path or not Path(local_path).exists():
         raise FileNotFoundError(f"Local log file not found: {local_log_path}")
 
-    remote_path = f"{project_remote_dir.rstrip('/')}/{Path(local_path).name}"
+    remote_path = f"{remote_dir.rstrip('/')}/{Path(local_path).name}"
     upload_file(local_path=local_path, remote_path=remote_path)
     return remote_path

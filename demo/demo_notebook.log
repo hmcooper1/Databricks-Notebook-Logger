@@ -1,9 +1,9 @@
 ====================================================================================================
 user                 : hmcooper@berkeley.edu
-run start timestamp  : 2026-03-07T16:04:09+00:00
+run start timestamp  : 2026-03-07T17:11:36+00:00
 notebook             : /Repos/hmcooper@berkeley.edu/Databricks-Notebook-Logger/demo/demo_notebook
 log file             : /Repos/hmcooper@berkeley.edu/Databricks-Notebook-Logger/demo/demo_notebook.log
-cluster id           : 0307-152139-2nq82ksz-v2n
+cluster id           : 0307-171125-5mde8fi8-v2n
 python               : 3.12.3
 ipython              : 8.32.0
 spark                : 3.5.2
@@ -21,7 +21,7 @@ from pyspark.sql.window import Window
 import warnings
 from datetime import date
 
-NOTE: Cell started at  2026-03-07T16:04:25+00:00 and finished at 2026-03-07T16:04:25+00:00
+NOTE: Cell started at  2026-03-07T17:12:05+00:00 and finished at 2026-03-07T17:12:05+00:00
 NOTE: Step completed in 0.02 seconds
 ----------------------------------------------------------------------------------------------------
 # Create sample patient visit data
@@ -48,8 +48,8 @@ patient_visits.show()
 |      P002|2023-08-26|         99213|      Diabetes|
 +----------+----------+--------------+--------------+
 
-NOTE: Cell started at  2026-03-07T16:04:25+00:00 and finished at 2026-03-07T16:04:25+00:00
-NOTE: Step completed in 0.43 seconds
+NOTE: Cell started at  2026-03-07T17:12:05+00:00 and finished at 2026-03-07T17:12:28+00:00
+NOTE: Step completed in 23.14 seconds
 ----------------------------------------------------------------------------------------------------
 # Create sample patient demographics table
 demographics_data = [
@@ -71,8 +71,8 @@ demographics.show()
 |      P004|Female| 28|  Medicaid|
 +----------+------+---+----------+
 
-NOTE: Cell started at  2026-03-07T16:04:25+00:00 and finished at 2026-03-07T16:04:25+00:00
-NOTE: Step completed in 0.28 seconds
+NOTE: Cell started at  2026-03-07T17:12:29+00:00 and finished at 2026-03-07T17:12:30+00:00
+NOTE: Step completed in 1.43 seconds
 ----------------------------------------------------------------------------------------------------
 # Join sample visit with demographic data
 patient_analysis = patient_visits.join(demographics, on="patient_id", how="left")
@@ -89,8 +89,8 @@ patient_analysis.show()
 |      P002|2023-08-26|         99213|      Diabetes|Female| 62|  Medicare|
 +----------+----------+--------------+--------------+------+---+----------+
 
-NOTE: Cell started at  2026-03-07T16:04:26+00:00 and finished at 2026-03-07T16:04:26+00:00
-NOTE: Step completed in 0.59 seconds
+NOTE: Cell started at  2026-03-07T17:12:30+00:00 and finished at 2026-03-07T17:12:34+00:00
+NOTE: Step completed in 3.80 seconds
 ----------------------------------------------------------------------------------------------------
 # Create sample summary statistics by demographics
 summary = patient_analysis.groupBy("gender", "insurance") \
@@ -111,22 +111,22 @@ summary.show(truncate=False)
 |Male  |Commercial|3           |2              |41.333333333333336|
 +------+----------+------------+---------------+------------------+
 
-NOTE: Cell started at  2026-03-07T16:04:26+00:00 and finished at 2026-03-07T16:04:27+00:00
-NOTE: Step completed in 0.73 seconds
+NOTE: Cell started at  2026-03-07T17:12:34+00:00 and finished at 2026-03-07T17:12:38+00:00
+NOTE: Step completed in 3.91 seconds
 ----------------------------------------------------------------------------------------------------
 # Test print statement
 print("Analysis complete: Generated summary statistics by gender and insurance type.")
 
 Analysis complete: Generated summary statistics by gender and insurance type.
 
-NOTE: Cell started at  2026-03-07T16:04:27+00:00 and finished at 2026-03-07T16:04:27+00:00
+NOTE: Cell started at  2026-03-07T17:12:38+00:00 and finished at 2026-03-07T17:12:38+00:00
 NOTE: Step completed in 0.00 seconds
 ----------------------------------------------------------------------------------------------------
 # Create temporary view to query with SQL
 patient_visits.createOrReplaceTempView("patient_visits")
 
-NOTE: Cell started at  2026-03-07T16:04:27+00:00 and finished at 2026-03-07T16:04:27+00:00
-NOTE: Step completed in 0.25 seconds
+NOTE: Cell started at  2026-03-07T17:12:38+00:00 and finished at 2026-03-07T17:12:39+00:00
+NOTE: Step completed in 0.42 seconds
 ----------------------------------------------------------------------------------------------------
 # Query from spark.sql() will show up in the log
 spark.sql("""
@@ -136,8 +136,8 @@ from patient_visits
 group by diagnosis
 """)
 
-NOTE: Cell started at  2026-03-07T16:04:28+00:00 and finished at 2026-03-07T16:04:28+00:00
-NOTE: Step completed in 0.29 seconds
+NOTE: Cell started at  2026-03-07T17:12:39+00:00 and finished at 2026-03-07T17:12:40+00:00
+NOTE: Step completed in 1.14 seconds
 ----------------------------------------------------------------------------------------------------
 # Spark is lazy: doesn't actually execute this query - output will NOT display in the log
 spark.sql("""
@@ -145,8 +145,8 @@ select count(*) as total_diagnoses
 from diagnosis_summary
 """)
 
-NOTE: Cell started at  2026-03-07T16:04:28+00:00 and finished at 2026-03-07T16:04:28+00:00
-NOTE: Step completed in 0.19 seconds
+NOTE: Cell started at  2026-03-07T17:12:40+00:00 and finished at 2026-03-07T17:12:41+00:00
+NOTE: Step completed in 0.53 seconds
 ----------------------------------------------------------------------------------------------------
 # Use .show(truncate=False) to execute query and display output in the log file
 # truncate=False ensures no values are truncated/cut off in the log file
@@ -164,8 +164,8 @@ where diagnosis = 'Hypertension'
 |Diabetes    |2            |
 +------------+-------------+
 
-NOTE: Cell started at  2026-03-07T16:04:28+00:00 and finished at 2026-03-07T16:04:29+00:00
-NOTE: Step completed in 0.39 seconds
+NOTE: Cell started at  2026-03-07T17:12:41+00:00 and finished at 2026-03-07T17:12:42+00:00
+NOTE: Step completed in 0.79 seconds
 ----------------------------------------------------------------------------------------------------
 # Use log_df to display table contents in the log file
 log_df("diagnosis_summary", limit=10)
@@ -180,15 +180,15 @@ log_df("diagnosis_summary", limit=10)
 |Asthma        |1            |
 +--------------+-------------+
 
-NOTE: Cell started at  2026-03-07T16:04:29+00:00 and finished at 2026-03-07T16:04:29+00:00
-NOTE: Step completed in 0.48 seconds
+NOTE: Cell started at  2026-03-07T17:12:42+00:00 and finished at 2026-03-07T17:12:43+00:00
+NOTE: Step completed in 0.86 seconds
 ----------------------------------------------------------------------------------------------------
 # User warning
 warnings.warn("This is a test warning", UserWarning)
 
 WARNING: This is a test warning
 
-NOTE: Cell started at  2026-03-07T16:04:29+00:00 and finished at 2026-03-07T16:04:29+00:00
+NOTE: Cell started at  2026-03-07T17:12:43+00:00 and finished at 2026-03-07T17:12:43+00:00
 NOTE: Step completed in 0.00 seconds
 ----------------------------------------------------------------------------------------------------
 stop_logging()
@@ -197,6 +197,6 @@ stop_logging()
 ====================================================================================================
 NOTEBOOK RAN SUCCESSFULLY WITH NO ERRORS
 WARNING: This is a test warning
-run end timestamp    : 2026-03-07T16:04:29+00:00
-total runtime        : 20.87 seconds
+run end timestamp    : 2026-03-07T17:12:43+00:00
+total runtime        : 67.61 seconds
 ====================================================================================================

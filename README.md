@@ -19,7 +19,7 @@ Databricks is traditionally used for exploratory analysis and interactive develo
 
 The logging system creates a comprehensive record of your notebook execution:
 * **Metadata**: User, timestamp, cluster configuration, Python/Spark versions
-* **All executed Python code**: Every code cell that runs in Python
+* **All executed Python code**: Every code cell that runs in Python and it's output
 * **SQL queries**: All queries executed via `spark.sql()` with their results
 * **Complete outputs**: Results from `print()`, `df.show()`, and table displays
 * **Warnings and errors**: Full error tracebacks and warning messages
@@ -62,7 +62,7 @@ When prompted:
 * Enter your SFTP credentials
 * Optionally save your credentials for the cluster session duration
 
-This establishes the secure connection and begins capturing all cells for your audit trail.
+This establishes the secure connection and begins capturing all cells for your audit trail. If you do not specify an `output_directory`, SFTP upload will be skipped.
 
 #### 4. Add Your Code
 
