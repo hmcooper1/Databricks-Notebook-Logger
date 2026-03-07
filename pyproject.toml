@@ -7,15 +7,27 @@ name = "notebook-logger"
 version = "0.1.0"
 description = "Databricks logging framework for Python notebooks, including support for Spark SQL execution, with optional SFTP upload of log and HTML artifacts."
 authors = [
-    { name = "Hannah Cooper" }
+    { name = "Hannah Cooper", email = "hmcooper@berkeley.edu" }
 ]
 readme = "README.md"
 requires-python = ">=3.9"
+license = {text = "MIT"}
 
 dependencies = [
     "requests",
     "paramiko"
 ]
+
+keywords = ["databricks", "logging", "log", "notebook", "sftp", "audit-trail", "notebook", "regulatory"]
+
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+]
+
+[project.urls]
+Homepage = "https://github.com/hmcooper1/Databricks-Notebook-Logger"
 
 [tool.setuptools]
 package-dir = {"" = "src"}
