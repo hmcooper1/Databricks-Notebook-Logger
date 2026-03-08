@@ -30,7 +30,7 @@ The logging system creates a comprehensive record of your notebook execution:
 
 **Secure Delivery**: Both the text log and HTML notebook snapshot are automatically uploaded to your specified location via SFTP
 
-Note: for a visual overview of how the logging system works on the backend, refer to *[databricks_log_diagram.pdf](databricks_log_diagram.pdf)*. The PDF may not render clearly in GitLab, so you will need to download it to zoom in
+Note: for a visual overview of how the logging system works on the backend, refer to [databricks log diagram](https://github.com/hmcooper1/Databricks-Notebook-Logger/blob/main/docs/databricks_log_diagram.pdf). The PDF may not render clearly in GitLab, so you will need to download it to zoom in
 
 
 ## Quick Start
