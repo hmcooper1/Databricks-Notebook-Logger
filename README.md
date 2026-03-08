@@ -1,3 +1,6 @@
+[![PyPI version](https://badge.fury.io/py/nb-audit-logger.svg)](https://badge.fury.io/py/nb-audit-logger)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+
 # Databricks Notebook Logger & Audit Trail System
 
 A comprehensive logging system for Databricks notebooks that creates **SAS-style audit trails** for regulatory compliance and validation. This tool generates detailed execution logs and HTML snapshots of your notebooks, then transfers them securely via SFTP to wherever you need them stored. See [demo notebook](https://github.com/hmcooper1/Databricks-Notebook-Logger/blob/main/demo/demo_notebook.ipynb) and [demo log file](https://github.com/hmcooper1/Databricks-Notebook-Logger/blob/main/demo/demo_notebook.log) for a full example of this utilized in a notebook with further explanations.

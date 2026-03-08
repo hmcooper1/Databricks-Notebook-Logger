@@ -1,9 +1,9 @@
 ====================================================================================================
 user                 : hmcooper@berkeley.edu
-run start timestamp  : 2026-03-07T16:02:54+00:00
+run start timestamp  : 2026-03-08T13:19:00+00:00
 notebook             : /Repos/hmcooper@berkeley.edu/Databricks-Notebook-Logger/demo/error_notebook
 log file             : /Repos/hmcooper@berkeley.edu/Databricks-Notebook-Logger/demo/error_notebook.log
-cluster id           : 0307-160243-9junmck2-v2n
+cluster id           : 0308-131839-2s65c9b2-v2n
 python               : 3.12.3
 ipython              : 8.32.0
 spark                : 3.5.2
@@ -21,8 +21,8 @@ from pyspark.sql.window import Window
 import warnings
 from datetime import date
 
-NOTE: Cell started at  2026-03-07T16:03:09+00:00 and finished at 2026-03-07T16:03:09+00:00
-NOTE: Step completed in 0.02 seconds
+NOTE: Cell started at  2026-03-08T13:19:25+00:00 and finished at 2026-03-08T13:19:25+00:00
+NOTE: Step completed in 0.03 seconds
 ----------------------------------------------------------------------------------------------------
 # Create sample patient visit data
 visit_data = [
@@ -48,19 +48,19 @@ patient_visits.show()
 |      P002|2023-08-26|         99213|      Diabetes|
 +----------+----------+--------------+--------------+
 
-NOTE: Cell started at  2026-03-07T16:03:10+00:00 and finished at 2026-03-07T16:03:10+00:00
-NOTE: Step completed in 0.51 seconds
+NOTE: Cell started at  2026-03-08T13:19:26+00:00 and finished at 2026-03-08T13:19:26+00:00
+NOTE: Step completed in 0.43 seconds
 ----------------------------------------------------------------------------------------------------
 raise ValueError("This is a test error.")
 
-NOTE: Cell started at  2026-03-07T16:03:10+00:00 and finished at 2026-03-07T16:03:11+00:00
-NOTE: Step completed in 0.60 seconds
+NOTE: Cell started at  2026-03-08T13:19:26+00:00 and finished at 2026-03-08T13:19:27+00:00
+NOTE: Step completed in 0.45 seconds
 ERROR: ValueError: This is a test error.
 NOTE: Logging stopped due to cell error.
 
 ====================================================================================================
 NOTEBOOK DID NOT SUCCESSFULLY RUN DUE TO ERROR
 ERROR: ValueError: This is a test error.
-run end timestamp    : 2026-03-07T16:03:11+00:00
-total runtime        : 17.08 seconds
+run end timestamp    : 2026-03-08T13:19:27+00:00
+total runtime        : 26.51 seconds
 ====================================================================================================
