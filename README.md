@@ -1,6 +1,6 @@
 # Databricks Notebook Logger & Audit Trail System
 
-A comprehensive logging system for Databricks notebooks that creates **SAS-style audit trails** for regulatory compliance and validation. This tool generates detailed execution logs and HTML snapshots of your notebooks, then transfers them securely via SFTP to wherever you need them stored. See `demo/demo_notebook` and `demo/demo_notebook.log` for a full example of this utilized in a notebook with further explanations.
+A comprehensive logging system for Databricks notebooks that creates **SAS-style audit trails** for regulatory compliance and validation. This tool generates detailed execution logs and HTML snapshots of your notebooks, then transfers them securely via SFTP to wherever you need them stored. See [demo notebook](https://github.com/hmcooper1/Databricks-Notebook-Logger/blob/main/demo/demo_notebook.ipynb) and [demo log file](https://github.com/hmcooper1/Databricks-Notebook-Logger/blob/main/demo/demo_notebook.log) for a full example of this utilized in a notebook with further explanations.
 
 ## Why This Tool?
 
@@ -43,8 +43,8 @@ Before adding any code, ensure your notebook is set to use Python as the default
 Add this code to the **first cell** of your notebook:
 
 ```python
-%pip install notebook-logger
-from notebook_logger import *
+%pip install nb-audit-logger
+from nb_audit_logger import *
 ```
 
 #### 3. Start Logging
